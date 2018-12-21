@@ -1,0 +1,29 @@
+version: '3'
+services:
+  mysql:
+   container_name: demo-mysql
+   image: mysql/mysql-server:5.7
+   volumes:  
+      - ./mysql/data:/var/lib/mysql
+   environment:
+    MYSQL_DATABASE: demo
+    MYSQL_ROOT_PASSWORD: root
+    MYSQL_ROOT_HOST: '%'
+   ports:
+   - "3306:3306"
+   restart: always
+    
+  demo:
+    restart: always
+    build: ./demo
+    working_dir: /demo
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./demo:/demo
+      - ~/.m2:/root/.m2
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+    command: mvn clean spring-boot:run -Dspring-boot.run.profiles=docker
+
